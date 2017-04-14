@@ -39,6 +39,7 @@
     "babel-eslint": "^7.2.2",
     "babel-preset-flow": "^6.23.0",
     "chai": "^3.5.0",
+    "eslint-plugin-flowtype": "^2.30.4",
     "express": "4.x",
     "flow-bin": "^0.44.0",
     "grunt": "^1.0.1",
