@@ -1,17 +1,17 @@
-var Router = require('express').Router;
-var _ = require('lodash');
-var isPromise = require('is-promise');
+const Router = require('express').Router;
+const _ = require('lodash');
+const isPromise = require("is-promise");
 
-var wrapHandler = function (handler) {
+const wrapHandler = function (handler) {
     if ('function' !== typeof handler) {
-        var type = Object.prototype.toString.call(handler);
-        var msg = 'Expected a callback function but got a ' + type;
+        const type = Object.prototype.toString.call(handler);
+        const msg = 'Expected a callback function but got a ' + type;
         throw new Error(msg);
     }
 
-    var handleReturn = function (args) {
+    const handleReturn = function (args) {
         // Find the next function from the arguments
-        var next = args.slice(-1)[0];
+        let next = args.slice(-1)[0];
 
         // When calling router.param, the last parameter is a string, not next.
         // If so, the next should be the one before it.
@@ -20,7 +20,7 @@ var wrapHandler = function (handler) {
         }
 
         // Call the route
-        var ret = handler.apply(null, args);
+        const ret = handler.apply(null, args);
 
         // If it doesn't return a promise, we exit.
         if (!isPromise(ret)) {
@@ -54,24 +54,24 @@ var wrapHandler = function (handler) {
     };
 };
 
-var wrapMethods = function (instanceToWrap, isRoute)
+const wrapMethods = function (instanceToWrap, isRoute)
 {
-    var toConcat = isRoute ? ['all'] : ['use','all','param'];
+    const toConcat = isRoute ? ['all'] : ['use','all','param'];
     
-    var methods = require('methods').concat(toConcat);
+    const methods = require('methods').concat(toConcat);
 
     _.each(methods, function (method) {
-        var original = '__' + method;
+        const original = '__' + method;
         instanceToWrap[original] = instanceToWrap[method];
         instanceToWrap[method] = function () {
             // Manipulating arguments directly is discouraged
-            var args = new Array(arguments.length); 
-            for(var i = 0; i < arguments.length; ++i) {
+            let args = new Array(arguments.length);
+            for(let i = 0; i < arguments.length; ++i) {
                 args[i] = arguments[i];
             }
 
             // Grab the first parameter out in case it's a route or array of routes.
-            var first = null;
+            let first = null;
             if ('string' === typeof args[0] || args[0] instanceof RegExp ||
                     (Array.isArray(args[0]) && 'string' === typeof args[0][0] || args[0][0] instanceof RegExp)) {
                 first = args[0];
@@ -94,9 +94,9 @@ var wrapMethods = function (instanceToWrap, isRoute)
     return instanceToWrap;
 };
 
-var PromiseRouter = function (path)
+const PromiseRouter = function (path)
 {
-    var me = wrapMethods(new Router(path));
+    const me = wrapMethods(new Router(path));
 
     me.__route = me.route;
     me.route = function(path)
