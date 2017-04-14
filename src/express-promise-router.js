@@ -1,3 +1,4 @@
+// @flow
 const Router = require('express').Router;
 const _ = require('lodash');
 const isPromise = require("is-promise");
@@ -94,7 +95,7 @@ const wrapMethods = function (instanceToWrap, isRoute)
     return instanceToWrap;
 };
 
-const PromiseRouter = function (path)
+const PromiseRouter = function (path: string|RegExp|string[])
 {
     const me = wrapMethods(new Router(path));
 
