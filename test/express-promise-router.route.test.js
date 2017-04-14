@@ -11,7 +11,7 @@ var delay = function (method, payload) {
     }, 10);
 };
 
-var PromiseRouter = require('../lib/express-promise-router.js');
+var PromiseRouter = require('../src/express-promise-router.js');
 
 describe('new Router().route(...)', function () {
     var app;

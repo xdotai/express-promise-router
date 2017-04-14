@@ -9,7 +9,7 @@ module.exports = function (grunt) {
     // Project configuration.
     grunt.initConfig({
         eslint: {
-            target: ['lib/**/*', 'test/**/*', 'Gruntfile.js']
+            target: ['src/**/*', 'test/**/*', 'Gruntfile.js']
         },
         mochaTest: {
             test: {
