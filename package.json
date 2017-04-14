@@ -39,6 +39,7 @@
     "babel-preset-flow": "^6.23.0",
     "chai": "^3.5.0",
     "express": "4.x",
+    "flow-bin": "^0.44.0",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
     "grunt-eslint": "^19.0.0",
@@ -52,6 +53,7 @@
   },
   "scripts": {
     "build": "babel src/ -d lib/",
+    "flow": "flow",
     "prepublish": "npm run build",
     "test": "grunt"
   }
