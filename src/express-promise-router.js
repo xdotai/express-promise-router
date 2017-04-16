@@ -1,7 +1,8 @@
 // @flow
-const Router = require('express').Router;
-const _ = require('lodash');
-const isPromise = require("is-promise");
+"use strict";
+var Router = require('express').Router;
+var _ = require('lodash');
+var isPromise = require('is-promise');
 
 const wrapHandler = function (handler) {
     if ('function' !== typeof handler) {
