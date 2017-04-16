@@ -4,14 +4,14 @@ var Router = require('express').Router;
 var _ = require('lodash');
 var isPromise = require('is-promise');
 
-const wrapHandler = function (handler) {
+const wrapHandler = function(handler) {
     if ('function' !== typeof handler) {
         const type = Object.prototype.toString.call(handler);
         const msg = 'Expected a callback function but got a ' + type;
         throw new Error(msg);
     }
 
-    const handleReturn = function (args) {
+    const handleReturn = function(args) {
         // Find the next function from the arguments
         let next = args.slice(-1)[0];
 
@@ -30,57 +30,61 @@ const wrapHandler = function (handler) {
         }
 
         // Since we got a promise, we handle calling next
-        Promise.resolve(ret)
-            .then(function (d) {
+        Promise.resolve(ret).then(
+            function(d) {
                 if (d === 'next') {
                     next();
                 } else if (d === 'route') {
                     next('route');
                 }
-            }, function (err) {
+            },
+            function(err) {
                 if (!err) {
                     err = new Error('returned promise was rejected but did not have a reason');
                 }
                 next(err);
-            });
+            }
+        );
     };
 
     if (handler.length === 4) {
-        return function (err, req, res, next) {
+        return function(err, req, res, next) {
             handleReturn([err, req, res, next]);
         };
     }
 
-    return function (req, res, next) {
+    return function(req, res, next) {
         handleReturn([req, res, next]);
     };
 };
 
-const wrapMethods = function (instanceToWrap, isRoute)
-{
-    const toConcat = isRoute ? ['all'] : ['use','all','param'];
-    
+const wrapMethods = function(instanceToWrap, isRoute) {
+    const toConcat = isRoute ? ['all'] : ['use', 'all', 'param'];
+
     const methods = require('methods').concat(toConcat);
 
-    _.each(methods, function (method) {
+    _.each(methods, function(method) {
         const original = '__' + method;
         instanceToWrap[original] = instanceToWrap[method];
-        instanceToWrap[method] = function () {
+        instanceToWrap[method] = function() {
             // Manipulating arguments directly is discouraged
             let args = new Array(arguments.length);
-            for(let i = 0; i < arguments.length; ++i) {
+            for (let i = 0; i < arguments.length; ++i) {
                 args[i] = arguments[i];
             }
 
             // Grab the first parameter out in case it's a route or array of routes.
             let first = null;
-            if ('string' === typeof args[0] || args[0] instanceof RegExp ||
-                    (Array.isArray(args[0]) && 'string' === typeof args[0][0] || args[0][0] instanceof RegExp)) {
+            if (
+                'string' === typeof args[0] ||
+                args[0] instanceof RegExp ||
+                ((Array.isArray(args[0]) && 'string' === typeof args[0][0]) || args[0][0] instanceof RegExp)
+            ) {
                 first = args[0];
                 args = args.slice(1);
             }
 
-            args = _.flattenDeep(args).map(function (arg) {
+            args = _.flattenDeep(args).map(function(arg) {
                 return wrapHandler(arg);
             });
 
@@ -96,13 +100,11 @@ const wrapMethods = function (instanceToWrap, isRoute)
     return instanceToWrap;
 };
 
-const PromiseRouter = function (path: string|RegExp|string[])
-{
+const PromiseRouter = function(path: string|RegExp|string[]) {
     const me = wrapMethods(new Router(path));
 
     me.__route = me.route;
-    me.route = function(path)
-    {
+    me.route = function(path) {
         return wrapMethods(me.__route(path), true);
     };
 
